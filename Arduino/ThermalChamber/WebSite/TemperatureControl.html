@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Thermo Chamber</title>
+<link href="style.css" rel="stylesheet" type="text/css">
+<script>
+let d = document;
+let intervalTime =2000;
+let timerId = setInterval(getParameters,intervalTime);
+
+function getParameters(){
+  let reqGetParameters = new XMLHttpRequest();
+  reqGetParameters.open("GET","Parameters?=",true);
+  reqGetParameters.timeout = 5000;
+  reqGetParameters.onreadystatechange = function(){
+    if(reqGetParameters.readyState != 4)return;
+    if(reqGetParameters.status != 200){
+	  clearInterval(timerId);
+	  intervalTime=8000;
+	  timerId = setInterval(getParameters,intervalTime);
+      //alert(reqGetParameters.status==0?"Timeout":reqGetParameters.statusText);
+    }else{
+	  if(intervalTime==8000){
+	    clearInterval(timerId);
+	    intervalTime=1000;
+		timerId = setInterval(getParameters,intervalTime);
+	  }
+	  let parameters = JSON.parse (reqGetParameters.response);
+      d.getElementById('Temperature').value = parameters.Temperature;
+      d.getElementById('ControlPinState').value = parameters.ControlPinState;
+	}
+  }
+  
+  try{
+    reqGetParameters.send(null);
+  }
+  catch(exception){
+    clearInterval(timerId);
+	intervalTime=8000;
+	timerId = setInterval(getParameters,intervalTime);
+  }
+}
+
+function getTMinTMax(){
+  let reqGetParameters = new XMLHttpRequest();
+  reqGetParameters.open("GET","TMinTMax?=",true);
+  reqGetParameters.timeout = 5000;
+  reqGetParameters.onreadystatechange = function(){
+    if(reqGetParameters.readyState != 4)return;
+    if(reqGetParameters.status != 200){
+	  clearInterval(timerId);
+	  intervalTime=8000;
+	  timerId = setInterval(getParameters,intervalTime);
+      alert(reqGetParameters.status==0?"Read parameters timeout":reqGetParameters.statusText);
+    }else{
+	  if(intervalTime==8000){
+	    clearInterval(timerId);
+	    intervalTime=1000;
+		timerId = setInterval(getParameters,intervalTime);
+	  }
+	  let parameters = JSON.parse (reqGetParameters.response);
+      d.getElementById('tMin').value = parameters.tMin;
+      d.getElementById('tMax').value = parameters.tMax;
+	}
+  }
+  
+  try{
+    reqGetParameters.send(null);
+  }
+  catch(exception){
+    clearInterval(timerId);
+	intervalTime=8000;
+	timerId = setInterval(getParameters,intervalTime);
+  }
+}
+
+function checkFloat(arg_id){
+  let element = d.getElementById(arg_id);
+  let num = parseFloat(element.value);
+  if(num != num){
+    element.classList.add('error-input-border');
+    element.classList.remove('correct-input-border');
+  return false;
+  }else{
+    if(!element.value.endsWith('.')) element.value = num;
+    element.classList.add('correct-input-border');
+    element.classList.remove('error-input-border');
+  return true;
+  }
+}
+
+function setTMinTMax(){
+  if(!checkFloat('tMin')){
+    alert("t Min input error.");
+	return;
+  }  
+  if(!checkFloat('tMax')){
+    alert("t Max input error.");
+	return;
+  }  
+  let settings ={
+    tMin: d.getElementById("tMin").value,
+    tMax: d.getElementById("tMax").value,
+  };
+  
+  let request = new XMLHttpRequest();
+  request.open("POST","TMinTMax",true);
+  request.timeout = 5000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200)alert(request.status==0?"Write t Min and t Max timeout":request.statusText);
+    else alert("t Min and t Max were writed successfully.");
+  }
+  try{request.send(JSON.stringify(settings));}
+  catch(exception){alert(exception);}
+}
+
+function onMainPageLoad(){
+  getParameters();
+  getTMinTMax();
+}
+</script>
+</head>
+<body onload="onMainPageLoad()">
+<div class="container">
+<div class = "hBlock">
+	<input type="button" class="topButtons" value = "Network Parameters" onclick="location.href='Index.html'">
+	<input type="button" class="topButtons" value = "Temperature Control"  onclick="location.href='TemperatureControl.html'">
+</div>
+<div id="header"><h1>Thermo Chamber</h1></div>
+<div>
+<h3>Temperature</h3>
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>Temperature, &degC</label></div>
+		<div class = "hBlock"><input type="text" id="Temperature"></div>
+	</div>
+	<div class = "vBlock"></div>
+</div>
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>t Min, &degC</label></div>
+		<div class = "hBlock"><input type="text" id="tMin"></div>
+	</div>
+	<div class = "vBlock">
+		<div class = "hBlock"><label>t Max, &degC</label></div>
+		<div class = "hBlock"><input type="text" id="tMax"></div>
+	</div>
+</div>
+<div class = "hBlock">
+	<div class = "vBlock"><input type="button" value = "Save t Min, t Max"  onclick="setTMinTMax()"></div>	
+	<div class = "vBlock"></div>
+</div>	
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>Control Pin State</label></div>
+		<div class = "hBlock"><input type="text" id="ControlPinState"></div>
+	</div>
+	<div class = "vBlock"></div>
+</div>
+</div>
+</div>
+</body>
+</html>

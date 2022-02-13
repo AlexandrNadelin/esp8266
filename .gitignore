@@ -1,0 +1,16 @@
+/Arduino/readme.txt
+/Arduino/ThermalChamber/build
+/Arduino/AdafrutMQTTClient
+/Arduino/examples
+/Arduino/httpServer
+/Arduino/mqttClient
+/Arduino/mqttClientTLSRightech
+/Arduino/mqttClientWiFiClientSecure
+/Arduino/R_04_HTTP
+/Arduino/R_04_HTTP_MODBUS_TCP
+/Arduino/R_04_HTTP_MODBUS_TCP_SEVERAL_CONNECTIONS
+/Arduino/R_04_LOW_COST
+/Arduino/R_04_LOW_COST_MQTT
+/Arduino/R_04_LOW_COST_MQTT_WIFISERVER
+/Arduino/R_04_LOW_COST_MQTT_WIFISERVER_INSECURE
+/Arduino/R_04_LOW_COST_MQTT_WIFISERVER_INSECURE_DHT11

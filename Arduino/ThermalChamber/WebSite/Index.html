@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Thermo Chamber</title>
+<link href="style.css" rel="stylesheet" type="text/css">
+<script>
+let d = document;
+
+function checkFloat(arg_id){
+  let element = d.getElementById(arg_id);
+  let num = parseFloat(element.value);
+  if(num != num){
+    element.classList.add('error-input-border');
+    element.classList.remove('correct-input-border');
+  return false;
+  }else{
+    if(!element.value.endsWith('.')) element.value = num;
+    element.classList.add('correct-input-border');
+    element.classList.remove('error-input-border');
+  return true;
+  }
+}
+
+function checkDecUint16(arg_id){
+  let element = d.getElementById(arg_id);
+  let num = parseInt(element.value, 10);
+  if(num != num||num<0||num>65535){
+    element.classList.add('error-input-border');
+    element.classList.remove('correct-input-border');
+    return false;
+  }else{
+    element.classList.add('correct-input-border');
+    element.classList.remove('error-input-border');
+    return true;
+  }
+}
+
+function checkText(arg_id){
+let element = d.getElementById(arg_id);
+  if(element.value==""){
+    element.classList.add('error-input-border');
+    element.classList.remove('correct-input-border');
+    return false;
+  }else{
+    element.classList.add('correct-input-border');
+    element.classList.remove('error-input-border');
+    return true;
+  }
+}
+
+function checkPASSWORD(arg_id){
+let element = d.getElementById(arg_id);
+  if(element.value==""||element.value.length<8){
+    element.classList.add('error-input-border');
+    element.classList.remove('correct-input-border');
+    return false;
+  }else{
+    element.classList.add('correct-input-border');
+    element.classList.remove('error-input-border');
+    return true;
+  }
+}
+
+function checkSettings(){
+  let result = true;
+  result &= checkText('ApSSID');
+  result &= checkPASSWORD('ApPASSWORD');
+  result &= checkIp('ApIPAddress');
+  result &= checkIp('ApSubnetMask');
+  result &= checkIp('ApGateway');
+  result &= checkDecUint16('ModbusTCPPort');
+  
+  result &= checkText('StSSID');
+  result &= checkPASSWORD('StPASSWORD');
+  result &= checkIp('StIPAddress');
+  result &= checkIp('StSubnetMask');
+  result &= checkIp('StGateway');
+  /*result &= checkDecUint16('MQTTPublishPeriod')*/
+  return result;
+}
+
+function checkIp(arg_id)
+{
+  let regexp=/^(?=\d+\.\d+\.\d+\.\d+$)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.?){4}$/;
+  let element = d.getElementById(arg_id);
+  let result = regexp.test(element.value);
+  if(!result){
+    element.classList.add('error-input-border');
+    element.classList.remove('correct-input-border');
+   }else{
+    element.classList.add('correct-input-border');
+    element.classList.remove('error-input-border');
+  }
+  return result;
+}
+
+function getNetworkParameters(){
+  let request = new XMLHttpRequest();
+  request.open("GET","NetworkParameters.property?=",true);
+  request.timeout = 5000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200){
+	  alert(request.status==0?"Read parameters timeout":request.statusText);
+    }else{
+	  let settings = JSON.parse (request.response);
+      d.getElementById('ApSSID').value = settings.ApSSID;
+      d.getElementById('ApPASSWORD').value = settings.ApPASSWORD;
+      d.getElementById('ApIPAddress').value = settings.ApIPAddress;
+      d.getElementById('ApSubnetMask').value = settings.ApSubnetMask;
+      d.getElementById('ApGateway').value = settings.ApGateway;
+      d.getElementById('ModbusTCPPort').value = settings.ModbusTCPPort;
+	  
+      d.getElementById('StSSID').value = settings.StSSID;
+      d.getElementById('StPASSWORD').value = settings.StPASSWORD;
+      d.getElementById('StIPAddress').value = settings.StIPAddress;
+      d.getElementById('StSubnetMask').value = settings.StSubnetMask;
+      d.getElementById('StGateway').value = settings.StGateway;
+      /*d.getElementById('MQTTPublishPeriod').value = settings.MQTTPublishPeriod;*/
+      getPemCAPeriod();
+	}
+  }
+  try{
+    request.send(null);
+  }
+  catch(exception){
+    alert(exception);
+  }
+}
+
+function setNetworkParameters(){
+  if(!checkSettings()){
+    alert("Settings input error.");
+	return;
+  }
+  
+  let settings ={
+    ApSSID: d.getElementById("ApSSID").value,
+    ApPASSWORD: d.getElementById("ApPASSWORD").value,
+    ApIPAddress: d.getElementById("ApIPAddress").value,
+    ApSubnetMask: d.getElementById("ApSubnetMask").value,
+    ApGateway: d.getElementById("ApGateway").value,
+    ModbusTCPPort: d.getElementById("ModbusTCPPort").value,
+	
+    StSSID: d.getElementById("StSSID").value,
+    StPASSWORD: d.getElementById("StPASSWORD").value,
+    StIPAddress: d.getElementById("StIPAddress").value,
+    StSubnetMask: d.getElementById("StSubnetMask").value,
+    StGateway: d.getElementById("StGateway").value,
+    /*MQTTPublishPeriod: d.getElementById("MQTTPublishPeriod").value.toString(),*/
+  };
+  
+  let request = new XMLHttpRequest();
+  request.open("POST","NetworkParameters.property",true);
+  request.timeout = 5000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200){
+	  alert(request.status==0?"Write parameters timeout":request.statusText);
+    }else{
+	  alert("Parameters were writed successfully.");
+	}
+  }
+  try{
+    request.send(JSON.stringify(settings));
+  }
+  catch(exception){
+    alert(exception);
+  }
+}
+
+function rebootDevice(){
+  let request = new XMLHttpRequest();
+  request.open("GET","reboot",true);
+  request.timeout = 5000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200){
+	  alert(request.status==0?"Reboot cmd timeout":request.statusText);
+    }else{
+	  alert("Device was rebooted successfully.");
+	}
+  }
+  try{
+    request.send(null);
+  }
+  catch(exception){
+    alert(exception);
+  }
+}
+</script>
+</head>
+<body onload="getNetworkParameters()">
+<div class="container">
+<div class = "hBlock">
+	<input type="button" class="topButtons" value = "Network Parameters" onclick="location.href='Index.html'">
+	<input type="button" class="topButtons" value = "Temperature Control"  onclick="location.href='TemperatureControl.html'">
+</div>
+<div id="header"><h1>Thermo Chamber</h1></div>
+<div>
+<h3>Access Point Network Parameters</h3>
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>SSID</label></div>
+		<div class = "hBlock"><input type="text" id="ApSSID" oninput="checkText('ApSSID')"></div>
+	</div>
+	<div class = "vBlock">
+		<div class = "hBlock"><label>PASSWORD</label></div>
+		<div class = "hBlock"><input type="text" id="ApPASSWORD" oninput="checkText('ApPASSWORD')"></div>
+	</div>
+</div>
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>IP address</label></div>
+		<div class = "hBlock"><input type="text" id="ApIPAddress" oninput="checkIp('ApIPAddress')"></div>
+	</div>
+	<div class = "vBlock">
+		<div class = "hBlock"><label>Subnet mask</label></div>
+		<div class = "hBlock"><input type="text" id="ApSubnetMask" oninput="checkIp('ApSubnetMask')"></div>
+	</div>
+</div>
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>Gateway</label></div>
+		<div class = "hBlock"><input type="text" id="ApGateway" oninput="checkIp('ApGateway')"></div>
+	</div>	
+	<div class = "vBlock">
+		<div class = "hBlock"><label>Modbus TCP port</label></div>
+		<div class = "hBlock"><input type="text" id="ModbusTCPPort" oninput="checkDecUint16('ModbusTCPPort')"></div>
+	</div>
+</div>
+<h3>Station Network Parameters</h3>
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>SSID</label></div>
+		<div class = "hBlock"><input type="text" id="StSSID" oninput="checkText('StSSID')"></div>
+	</div>
+	<div class = "vBlock">
+		<div class = "hBlock"><label>PASSWORD</label></div>
+		<div class = "hBlock"><input type="text" id="StPASSWORD" oninput="checkText('StPASSWORD')"></div>
+	</div>
+</div>
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>IP address</label></div>
+		<div class = "hBlock"><input type="text" id="StIPAddress" oninput="checkIp('StIPAddress')"></div>
+	</div>
+	<div class = "vBlock">
+		<div class = "hBlock"><label>Subnet mask</label></div>
+		<div class = "hBlock"><input type="text" id="StSubnetMask" oninput="checkIp('StSubnetMask')"></div>
+	</div>
+</div>
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>Gateway</label></div>
+		<div class = "hBlock"><input type="text" id="StGateway" oninput="checkIp('StGateway')"></div>
+	</div>	
+	<div class = "vBlock"></div>
+</div>
+<div class = "hBlock">
+	<div class = "vBlock"><input type="button" value = "Save Parameters" onclick="setNetworkParameters()"></div>
+	<div class = "vBlock"><input type="button" value = "Reboot Device" onclick="rebootDevice()"></div>
+</div>	
+</div>
+</div>
+</body>
+</html>

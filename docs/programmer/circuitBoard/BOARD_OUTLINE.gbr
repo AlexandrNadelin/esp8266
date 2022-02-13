@@ -1,0 +1,32 @@
+G04 Created by Delta Design Version 2.6.36104.0403*
+G04 Date: 11.09.2020 14:45:25*
+G04 Project: Programming the device ESP-07*
+G04 File name: BOARD_OUTLINE*
+G04 File format: RS274X*
+
+G04 Parameters*
+%FSAN2X44Y44D3M2*%
+%MIA0B0*%
+%MOMM*%
+%IOA0B0*%
+%SFA1B1*%
+%IJ*%
+%IR0*%
+G04 End parameters*
+G04 Aperture macros*
+
+G04 End Aperture macros*
+G04 Apertures*
+%ADD10C,.300000*%
+G04 End apertures*
+G04 Layers*
+%LNBOARD_OUTLINE*%
+%SRX1Y1I0J0*%
+G54D10*
+G01X-00158000Y-00100000D02*
+G01X00148000Y-00100000D01*
+G01X00148000Y00168500D01*
+G01X-00158000Y00168500D01*
+G01X-00158000Y-00100000D01*
+G04 End Layers*
+M02*

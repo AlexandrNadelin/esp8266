@@ -6,11 +6,13 @@
 
 #define LED_PIN           2
 #define SELECT_MODE_PIN   4
-#define T_H_SENSOR_PIN    5
+#define T_H_SENSOR_PIN    5/*D1*/
 #define OUT1_HIGH_PIN     12
 #define OUT1_LOW_PIN      13
-#define OUT1_HIGH_PIN     14
-#define OUT1_LOW_PIN      15
+#define OUT2_HIGH_PIN     14
+#define OUT2_LOW_PIN      15
+
+#define A_IN              A0  /* ESP8266 Analog Pin ADC0 = A0*/
 
 struct DataModel{
   float Temperature;//float A_IN_Voltage;

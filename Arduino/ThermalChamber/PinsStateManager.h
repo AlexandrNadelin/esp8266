@@ -6,15 +6,6 @@
 #include "MemoryManager.h"
 #include "StringReplaser.h"
 
-/*#define D_IN_1  14
-#define D_IN_2  12
-#define D_OUT_1 15
-
-//if D_IN_MODE is HIGH (released) -> WIFI_STA, else WIFI_AP
-#define D_IN_MODE  13*/
-
-const int A_IN = A0;  // ESP8266 Analog Pin ADC0 = A0
-
 class PinsStateManager
 {
   public:
@@ -23,11 +14,19 @@ class PinsStateManager
     void begin(MemoryManager* memoryManager)
     {
       this->memoryManager=memoryManager;
-      /*pinMode(D_IN_1, INPUT_PULLUP);
-      pinMode(D_IN_2, INPUT_PULLUP);*/
       pinMode(SELECT_MODE_PIN, INPUT_PULLUP);
-      /*pinMode(D_OUT_1, OUTPUT);
-      digitalWrite(D_OUT_1, LOW);*/
+      
+      digitalWrite(OUT1_HIGH_PIN, LOW);
+      pinMode(OUT1_HIGH_PIN, OUTPUT);
+      
+      digitalWrite(OUT1_LOW_PIN, LOW);
+      pinMode(OUT1_LOW_PIN, OUTPUT);
+      
+      digitalWrite(OUT2_HIGH_PIN, LOW);
+      pinMode(OUT2_HIGH_PIN, OUTPUT);
+      
+      digitalWrite(OUT2_LOW_PIN, LOW);
+      pinMode(OUT2_LOW_PIN, OUTPUT);
 
       //dataModel.A_IN_Voltage=(state_A_IN = (analogRead(A_IN)*3.3F/1024.0F)*this->memoryManager->ainCoefficent);
 

@@ -6,23 +6,18 @@
 #include "PinsStateManager.h"
 #include "WIFIManager.h"
 #include "DHT.h"
-
-#define DHTTYPE DHT11
-// DHT датчик
-uint8_t DHTPin = D1;/*GPIO5*/; 
                
 // Инициализация датчика DHT
-DHT dht(DHTPin, DHTTYPE);       
+DHT dht(T_H_SENSOR_PIN, DHT11);       
 
 WIFIManager wifiManager;
 PinsStateManager pinsStateManager;
 
 MemoryManager memoryManager;
-Ticker pinsStateManagerLoopTicker;
 
 void setup()
 {
-  pinMode(DHTPin, INPUT);
+  pinMode(T_H_SENSOR_PIN, INPUT);
   dht.begin();  
   
   digitalWrite(LED_PIN, HIGH);
@@ -35,11 +30,6 @@ void setup()
 
   memoryManager.begin();
   pinsStateManager.begin(&memoryManager);
-  
-  dataModel.Temperature = dht.readTemperature(); // Получает значения температуры
-  dataModel.Humidity = dht.readHumidity(); // Получает значения влажности
-
-  pinsStateManagerLoopTicker.attach(1.0,[](){pinsStateManager.loop();}); 
 
   wifiManager.begin(&memoryManager,&pinsStateManager);
 }
@@ -47,6 +37,8 @@ void setup()
 void loop() {
   dataModel.Temperature = dht.readTemperature(); // Получает значения температуры
   dataModel.Humidity = dht.readHumidity(); // Получает значения влажности
+
+  pinsStateManager.loop();
   
   wifiManager.loop();
 }

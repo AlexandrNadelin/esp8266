@@ -352,10 +352,6 @@ class ModbusTCPServer
                 if(modbusTCPHeader->data[5+(i/8)]&(1<<(i%8)))coilRegisters->dataBytes[registerByte]=coilRegisters->dataBytes[registerByte]|mask;
                 else coilRegisters->dataBytes[registerByte]=coilRegisters->dataBytes[registerByte]&~(uint8_t)mask;
               }
-              //if(packetReceiveCallback!=NULL)server->packetReceiveCallback(WRITE_COIL_REGISTERS,addressStartReg,amountOfRegs,(uint16_t*)coilRegisters->CoilRegisterBytes);
-
-              //delete
-              //if((memoryManager->doutStateFormulaStr[0]=='0'&&memoryManager->doutStateFormulaStr[1]==0)||(memoryManager->doutStateFormulaStr[0]=='1'&&memoryManager->doutStateFormulaStr[1]==0))pinsStateManager->setDOUT1State(coilRegisters->dataBytes[0]&0x01);
               
               dataLength=6;
               modbusTCPHeader->dataLength = littleToBig16(dataLength);

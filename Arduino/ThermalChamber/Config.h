@@ -14,20 +14,22 @@
 
 #define A_IN              A0  /* ESP8266 Analog Pin ADC0 = A0*/
 
-struct DataModel{
-  float Temperature;//float A_IN_Voltage;
-  float Humidity;
-  uint8_t D_OUT_1_Control;
+struct ModbusData{
+float Temperature;
+float Humidity;
+uint16_t doutState;
+uint16_t controlAllowed;
 };
 
-DataModel dataModel={
-  .Temperature=-273.0F,//.A_IN_Voltage=3.1F,
+ModbusData modbusData ={
+  .Temperature=0,
   .Humidity=0,
-  .D_OUT_1_Control=0x01,
+  .doutState=1,/*0 - heating, 1 - disabled, 2 - coolling*/
+  .controlAllowed=1,/*0- denied, 1 -allowed*/
 };
 
-InputRegisters inputRegisters = {2,(uint16_t*)&dataModel.Temperature};
-CoilRegisters coilRegisters = {1,&dataModel.D_OUT_1_Control};
+InputRegisters inputRegisters = {5,(uint16_t*)&modbusData.Temperature};
+CoilRegisters coilRegisters = {1,(uint8_t*)&modbusData.controlAllowed};
 
 const uint8_t infoString[]="R_04_LOW_COST";
 InfoRegisters infoRegisters={sizeof(infoString),(uint8_t*)infoString};

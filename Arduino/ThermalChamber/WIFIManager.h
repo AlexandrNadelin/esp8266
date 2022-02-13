@@ -16,7 +16,7 @@ class WIFIManager
       this->memoryManager=memoryManager;
       this->pinsStateManager = pinsStateManager;
       
-      if(pinsStateManager->getDINModeState())
+      if(pinsStateManager->DINModeState)
       {
         WiFi.mode(WIFI_STA);
         WiFi.begin(memoryManager->networkProperty.stSSID,memoryManager->networkProperty.stPassword);
@@ -32,7 +32,7 @@ class WIFIManager
 
         modbusTCPServer.infoRegisters=&infoRegisters;
         modbusTCPServer.inputRegisters=&inputRegisters;
-        //modbusTCPServer.contactRegisters=&contactRegisters;
+        modbusTCPServer.contactRegisters=NULL;//&contactRegisters;
         modbusTCPServer.coilRegisters=&coilRegisters;
         modbusTCPServer.begin(memoryManager,pinsStateManager);
       }
@@ -71,7 +71,7 @@ class WIFIManager
 
     void loop()
     {
-      if(pinsStateManager->getDINModeState())
+      if(pinsStateManager->DINModeState)
       {
         if(WiFi.status() != WL_CONNECTED)
         { 

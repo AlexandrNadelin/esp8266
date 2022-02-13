@@ -463,8 +463,8 @@ class HTTPServer
               {
                 int numberOfBytes = sprintf(receiveArray
                                            ,"{\"Temperature\":\"%f\",\"ControlPinState\":\"%u\"}"
-                                           ,dataModel.Temperature//pinsStateManager->getAINState()
-                                           ,pinsStateManager->getDOUTState());//pinsStateManager->getDOUTState());
+                                           ,modbusData.Temperature
+                                           ,modbusData.doutState);
                 receiveArray[numberOfBytes]=0;              
 
                 int len = sprintf(&receiveArray[RECEIVE_ARRAY_SIZE-256],PAGE_HEADER,"application/json",numberOfBytes);//at the end

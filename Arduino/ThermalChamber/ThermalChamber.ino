@@ -35,8 +35,8 @@ void setup()
 }
 
 void loop() {
-  dataModel.Temperature = dht.readTemperature(); // Получает значения температуры
-  dataModel.Humidity = dht.readHumidity(); // Получает значения влажности
+  modbusData.Temperature = dht.readTemperature(); // Получает значения температуры
+  modbusData.Humidity = dht.readHumidity(); // Получает значения влажности
 
   pinsStateManager.loop();
   

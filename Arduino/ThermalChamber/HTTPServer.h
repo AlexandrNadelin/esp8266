@@ -352,10 +352,65 @@ class HTTPServer
                 int len = sprintf(&receiveArray[RECEIVE_ARRAY_SIZE-256],PAGE_HEADER,"application/json",0);//at the end
                 client.write(&receiveArray[RECEIVE_ARRAY_SIZE-256],len);            
               }
-              else if(memcmp(&receiveArray[0],"POST /TMinTMax",sizeof("POST /TMinTMax")-1)==0)
+              else if(memcmp(&receiveArray[0],"POST /setTMinTMax",sizeof("POST /setTMinTMax")-1)==0)
               {
                 int dataLen=0;
-                for(int i=sizeof("POST /TMinTMax HTTP/1.1")-1;i<receiveDataCounter;i++)
+                for(int i=sizeof("POST /setTMinTMax HTTP/1.1")-1;i<receiveDataCounter;i++)
+                {
+                  if(memcmp(&receiveArray[i],"Content-Length:",sizeof("Content-Length:")-1)==0)
+                  {
+                    dataLen = strtol(&receiveArray[i+sizeof("Content-Length:")-1], NULL, 10);
+                  }
+                }
+
+                int dataCount=0;
+                while(dataCount<dataLen)
+                {
+                  while(client.available())
+                  {
+                    previousActionTimeSt = millis();
+                    receiveArray[dataCount]=client.read();
+                    dataCount++;
+                  }
+                  
+                  currentTimeSt=millis();
+                  if(calculateTimeSpan(currentTimeSt, previousActionTimeSt)>1000)
+                  {                    
+                    #ifdef SERIAL_DEBUG_ENABLED
+                    Serial.println("Receive timeout 1000ms");
+                    #endif
+                    break;
+                  }
+                }
+                if(dataCount<dataLen)break;
+
+                for(dataCount = 2; dataCount < dataLen-(sizeof("tMin")-1);dataCount++)
+                {
+                  if(memcmp(&receiveArray[dataCount],"tMin",sizeof("tMin")-1)==0)
+                  {
+                    dataCount+=(sizeof("tMin")-1+3);
+                    memoryManager->tMin=atof(&receiveArray[dataCount]);
+                    break;
+                  }
+                }
+
+                for(; dataCount < dataLen-(sizeof("tMax")-1);dataCount++)
+                {
+                  if(memcmp(&receiveArray[dataCount],"tMax",sizeof("tMax")-1)==0)
+                  {
+                    dataCount+=(sizeof("tMin")-1+3);
+                    memoryManager->tMax=atof(&receiveArray[dataCount]);
+                    break;
+                  }
+                }
+
+                int len = sprintf(&receiveArray[RECEIVE_ARRAY_SIZE-256],PAGE_HEADER,"application/json",0);//at the end
+                client.write(&receiveArray[RECEIVE_ARRAY_SIZE-256],len);            
+              }
+              else if(memcmp(&receiveArray[0],"POST /saveTMinTMax",sizeof("POST /saveTMinTMax")-1)==0)
+              {
+                int dataLen=0;
+                for(int i=sizeof("POST /saveTMinTMax HTTP/1.1")-1;i<receiveDataCounter;i++)
                 {
                   if(memcmp(&receiveArray[i],"Content-Length:",sizeof("Content-Length:")-1)==0)
                   {
@@ -462,15 +517,28 @@ class HTTPServer
               else if(memcmp(&receiveArray[0],"GET /Parameters",sizeof("GET /Parameters")-1)==0)
               {
                 int numberOfBytes = sprintf(receiveArray
-                                           ,"{\"Temperature\":\"%f\",\"ControlPinState\":\"%u\"}"
+                                           ,"{\"Temperature\":\"%f\",\"Humidity\":\"%f\",\"ControlState\":\"%s\"}"
                                            ,modbusData.Temperature
-                                           ,modbusData.doutState);
+                                           ,modbusData.Humidity
+                                           ,modbusData.doutState==0?"Heating":modbusData.doutState==1?"Stopped":"Coolling");
                 receiveArray[numberOfBytes]=0;              
 
                 int len = sprintf(&receiveArray[RECEIVE_ARRAY_SIZE-256],PAGE_HEADER,"application/json",numberOfBytes);//at the end
 
                 client.write(&receiveArray[RECEIVE_ARRAY_SIZE-256],len);
                 client.write(receiveArray,numberOfBytes);
+              }
+              else if(memcmp(&receiveArray[0],"POST /EnableAlgo",sizeof("POST /EnableAlgo")-1)==0)
+              {
+                 modbusData.controlAllowed=1;
+                 int len = sprintf(&receiveArray[RECEIVE_ARRAY_SIZE-256],PAGE_HEADER,"application/json",0);//at the end
+                client.write(&receiveArray[RECEIVE_ARRAY_SIZE-256],len);
+              }
+              else if(memcmp(&receiveArray[0],"POST /DisableAlgo",sizeof("POST /DisableAlgo")-1)==0)
+              {
+                modbusData.controlAllowed=0;
+                int len = sprintf(&receiveArray[RECEIVE_ARRAY_SIZE-256],PAGE_HEADER,"application/json",0);//at the end
+                client.write(&receiveArray[RECEIVE_ARRAY_SIZE-256],len);
               }
               else
               {

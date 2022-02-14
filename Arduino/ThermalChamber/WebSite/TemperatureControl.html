@@ -28,7 +28,8 @@ function getParameters(){
 	  }
 	  let parameters = JSON.parse (reqGetParameters.response);
       d.getElementById('Temperature').value = parameters.Temperature;
-      d.getElementById('ControlPinState').value = parameters.ControlPinState;
+      d.getElementById('Humidity').value = parameters.Humidity;
+      d.getElementById('ControlState').value = parameters.ControlState;
 	}
   }
   
@@ -105,7 +106,7 @@ function setTMinTMax(){
   };
   
   let request = new XMLHttpRequest();
-  request.open("POST","TMinTMax",true);
+  request.open("POST","setTMinTMax",true);
   request.timeout = 5000;
   request.onreadystatechange = function(){
     if(request.readyState != 4)return;
@@ -114,6 +115,50 @@ function setTMinTMax(){
   }
   try{request.send(JSON.stringify(settings));}
   catch(exception){alert(exception);}
+}
+
+function saveTMinTMax(){
+  if(!checkFloat('tMin')){
+    alert("t Min input error.");
+	return;
+  }  
+  if(!checkFloat('tMax')){
+    alert("t Max input error.");
+	return;
+  }  
+  let settings ={
+    tMin: d.getElementById("tMin").value,
+    tMax: d.getElementById("tMax").value,
+  };
+  
+  let request = new XMLHttpRequest();
+  request.open("POST","saveTMinTMax",true);
+  request.timeout = 5000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200)alert(request.status==0?"Write t Min and t Max timeout":request.statusText);
+    else alert("t Min and t Max were writed successfully.");
+  }
+  try{request.send(JSON.stringify(settings));}
+  catch(exception){alert(exception);}
+}
+
+function enAlgoChange(){
+ let checkBoxEnAlgo = d.getElementById('EnAlgo');
+ if(checkBoxEnAlgo!=checkBoxEnAlgo)return;
+ let command = "DisableAlgo";
+ if(checkBoxEnAlgo.checked)command = "EnableAlgo";
+ 
+ let request = new XMLHttpRequest();
+ request.open("POST",command,true);
+ request.timeout = 5000;
+ request.onreadystatechange = function(){
+  if(request.readyState != 4)return;
+  if(request.status != 200)alert(request.status==0?command+" timeout":request.statusText);
+  else alert("t Min and t Max were writed successfully.");
+ }
+ try{request.send();}
+ catch(exception){alert(exception);}
 }
 
 function onMainPageLoad(){
@@ -136,7 +181,10 @@ function onMainPageLoad(){
 		<div class = "hBlock"><label>Temperature, &degC</label></div>
 		<div class = "hBlock"><input type="text" id="Temperature"></div>
 	</div>
-	<div class = "vBlock"></div>
+	<div class = "vBlock">
+		<div class = "hBlock"><label>Humidity, &#37;</label></div>
+		<div class = "hBlock"><input type="text" id="Humidity"></div>
+	</div>
 </div>
 <div class = "hBlock">
 	<div class = "vBlock">
@@ -149,12 +197,18 @@ function onMainPageLoad(){
 	</div>
 </div>
 <div class = "hBlock">
-	<div class = "vBlock"><input type="button" value = "Save t Min, t Max"  onclick="setTMinTMax()"></div>	
-	<div class = "vBlock"></div>
-</div>	
+	<div class = "vBlock"><input type="button" value = "Set t Min, t Max"  onclick="setTMinTMax()"></div>	
+	<div class = "vBlock"><input type="button" value = "Save t Min, t Max"  onclick="saveTMinTMax()"></div>
+</div>
 <div class = "hBlock">
 	<div class = "vBlock">
-		<div class = "hBlock"><label>Control Pin State</label></div>
+		<div class = "hBlock"><input type="checkbox" id="EnAlgo" onchange="enAlgoChange()" checked="checked"/><label>  Enable control algorithm</label></div>
+	</div>
+	<div class = "vBlock"></div>
+</div>
+<div class = "hBlock">
+	<div class = "vBlock">
+		<div class = "hBlock"><label>Control State</label></div>
 		<div class = "hBlock"><input type="text" id="ControlPinState"></div>
 	</div>
 	<div class = "vBlock"></div>

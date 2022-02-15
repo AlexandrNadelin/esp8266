@@ -155,7 +155,10 @@ function enAlgoChange(){
  request.onreadystatechange = function(){
   if(request.readyState != 4)return;
   if(request.status != 200)alert(request.status==0?command+" timeout":request.statusText);
-  else alert("t Min and t Max were writed successfully.");
+  else{ 
+    if(checkBoxEnAlgo.checked)alert("Control algorithm enabled.");
+    else alert("Control algorithm disabled.");
+  }
  }
  try{request.send();}
  catch(exception){alert(exception);}
@@ -209,7 +212,7 @@ function onMainPageLoad(){
 <div class = "hBlock">
 	<div class = "vBlock">
 		<div class = "hBlock"><label>Control State</label></div>
-		<div class = "hBlock"><input type="text" id="ControlPinState"></div>
+		<div class = "hBlock"><input type="text" id="ControlState"></div>
 	</div>
 	<div class = "vBlock"></div>
 </div>

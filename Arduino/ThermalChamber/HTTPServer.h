@@ -96,7 +96,7 @@ class HTTPServer
                 client.write(receiveArray,len);
                 client.write(data_TemperatureControl_html,size_TemperatureControl_html);
               }
-              else if(memcmp(&receiveArray[0],"GET /networkParameters.property",sizeof("GET /networkParameters.property")-1)==0)
+              else if(memcmp(&receiveArray[0],"GET /NetworkParameters.property",sizeof("GET /NetworkParameters.property")-1)==0)
               {
                 //---reading property---//
                 File networkParameters;
@@ -152,10 +152,10 @@ class HTTPServer
                 delay(400);
                 ESP.restart();                
               }
-              else if(memcmp(&receiveArray[0],"POST /networkParameters.property",sizeof("POST /networkParameters.property")-1)==0)
+              else if(memcmp(&receiveArray[0],"POST /NetworkParameters.property",sizeof("POST /NetworkParameters.property")-1)==0)
               {
                 int dataLen=0;
-                for(int i=sizeof("POST /networkParameters.property HTTP/1.1")-1;i<receiveDataCounter;i++)
+                for(int i=sizeof("POST /NetworkParameters.property HTTP/1.1")-1;i<receiveDataCounter;i++)
                 {
                   if(memcmp(&receiveArray[i],"Content-Length:",sizeof("Content-Length:")-1)==0)
                   {

@@ -41,22 +41,25 @@ class PinsStateManager
       {//Включаем нагреватель
         digitalWrite(OUT2_LOW_PIN, LOW);
         digitalWrite(OUT1_HIGH_PIN, LOW);
+        delayMicroseconds(1000);
         digitalWrite(OUT1_LOW_PIN, HIGH);
         digitalWrite(OUT2_HIGH_PIN, HIGH);
         modbusData.doutState=0;
       }
-      else if(modbusData.Temperature<memoryManager->tMin && modbusData.doutState!=2)//Температура больше максимума и охладитель не включен
+      else if(modbusData.Temperature>memoryManager->tMax && modbusData.doutState!=2)//Температура больше максимума и охладитель не включен
       {//Включаем охладитель
         digitalWrite(OUT1_LOW_PIN, LOW);
         digitalWrite(OUT2_HIGH_PIN, LOW);
+        delayMicroseconds(1000);
         digitalWrite(OUT2_LOW_PIN, HIGH);
         digitalWrite(OUT1_HIGH_PIN, HIGH);
         modbusData.doutState=2;
       }
-      else if(modbusData.doutState!=1)//Температура в порядке
+      else if(modbusData.Temperature>=memoryManager->tMin && modbusData.Temperature<=memoryManager->tMax && modbusData.doutState!=1)//Температура в порядке
       {//Выключаем все
         digitalWrite(OUT1_LOW_PIN, LOW);
         digitalWrite(OUT1_HIGH_PIN, LOW);
+        delayMicroseconds(1000);
         digitalWrite(OUT2_HIGH_PIN, LOW);
         digitalWrite(OUT2_LOW_PIN, LOW);
         modbusData.doutState=1;

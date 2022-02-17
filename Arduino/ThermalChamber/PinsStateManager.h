@@ -35,9 +35,22 @@ class PinsStateManager
 
     void loop()
     {  
-      if(modbusData.controlAllowed==0)return;
+      if(!modbusData.controlAllowed)//Не разрешено регулировать
+      {
+        if(modbusData.doutState!=1)//Включен или нагрев или охлаждение
+        {//Выключаем все
+          digitalWrite(OUT1_LOW_PIN, LOW);
+          digitalWrite(OUT1_HIGH_PIN, LOW);
+          digitalWrite(OUT2_HIGH_PIN, LOW);
+          digitalWrite(OUT2_LOW_PIN, LOW);
+          delayMicroseconds(1000);
+          modbusData.doutState=1; 
+          Serial.println();         
+        }
+        return;
+      }
 
-      if(modbusData.Temperature<memoryManager->tMin && modbusData.doutState!=0)//Температура меньше минимума и нагреватель не включен
+      if(modbusData.Temperature<modbusData.tMin && modbusData.doutState!=0)//Температура меньше минимума и нагреватель не включен
       {//Включаем нагреватель
         digitalWrite(OUT2_LOW_PIN, LOW);
         digitalWrite(OUT1_HIGH_PIN, LOW);
@@ -46,7 +59,7 @@ class PinsStateManager
         digitalWrite(OUT2_HIGH_PIN, HIGH);
         modbusData.doutState=0;
       }
-      else if(modbusData.Temperature>memoryManager->tMax && modbusData.doutState!=2)//Температура больше максимума и охладитель не включен
+      else if(modbusData.Temperature>modbusData.tMax && modbusData.doutState!=2)//Температура больше максимума и охладитель не включен
       {//Включаем охладитель
         digitalWrite(OUT1_LOW_PIN, LOW);
         digitalWrite(OUT2_HIGH_PIN, LOW);
@@ -55,13 +68,13 @@ class PinsStateManager
         digitalWrite(OUT1_HIGH_PIN, HIGH);
         modbusData.doutState=2;
       }
-      else if(modbusData.Temperature>=memoryManager->tMin && modbusData.Temperature<=memoryManager->tMax && modbusData.doutState!=1)//Температура в порядке
+      else if(modbusData.Temperature>=modbusData.tMin && modbusData.Temperature<=modbusData.tMax && modbusData.doutState!=1)//Температура в порядке
       {//Выключаем все
         digitalWrite(OUT1_LOW_PIN, LOW);
         digitalWrite(OUT1_HIGH_PIN, LOW);
-        delayMicroseconds(1000);
         digitalWrite(OUT2_HIGH_PIN, LOW);
         digitalWrite(OUT2_LOW_PIN, LOW);
+        delayMicroseconds(1000);
         modbusData.doutState=1;
       }
       

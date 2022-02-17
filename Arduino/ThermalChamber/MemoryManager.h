@@ -167,14 +167,14 @@ class MemoryManager {
          
          thresholds.close();
          writeDefaultThresholdsToFile();
-         tMin=-126.0;
-         tMax=127.0;
+         modbusData.tMin=-126.0;
+         modbusData.tMax=127.0;
        }
        else 
        {
         thresholds.close();
-        tMin = atof(thresholdsTMinStr);
-        tMax = atof(thresholdsTMaxStr);
+        modbusData.tMin = atof(thresholdsTMinStr);
+        modbusData.tMax = atof(thresholdsTMaxStr);
        }
        
   
@@ -194,8 +194,6 @@ class MemoryManager {
     }
     
     NetworkProperty networkProperty;
-    float tMin=-126.0;
-    float tMax=127.0;
   private:
   
 };

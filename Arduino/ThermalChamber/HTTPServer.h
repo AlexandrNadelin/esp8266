@@ -389,7 +389,7 @@ class HTTPServer
                   if(memcmp(&receiveArray[dataCount],"tMin",sizeof("tMin")-1)==0)
                   {
                     dataCount+=(sizeof("tMin")-1+3);
-                    memoryManager->tMin=atof(&receiveArray[dataCount]);
+                    modbusData.tMin=atof(&receiveArray[dataCount]);
                     break;
                   }
                 }
@@ -399,7 +399,7 @@ class HTTPServer
                   if(memcmp(&receiveArray[dataCount],"tMax",sizeof("tMax")-1)==0)
                   {
                     dataCount+=(sizeof("tMin")-1+3);
-                    memoryManager->tMax=atof(&receiveArray[dataCount]);
+                    modbusData.tMax=atof(&receiveArray[dataCount]);
                     break;
                   }
                 }
@@ -453,7 +453,7 @@ class HTTPServer
                   if(memcmp(&receiveArray[dataCount],"tMin",sizeof("tMin")-1)==0)
                   {
                     dataCount+=(sizeof("tMin")-1+3);
-                    memoryManager->tMin=atof(&receiveArray[dataCount]);
+                    modbusData.tMin=atof(&receiveArray[dataCount]);
                     while(receiveArray[dataCount]!='\"' && receiveArray[dataCount]!=0 && receiveArray[dataCount]!=',' && receiveArray[dataCount]!='}' && dataCount<dataLen)
                     {
                       if(receiveArray[dataCount]==',')thresholds.print('.');
@@ -470,7 +470,7 @@ class HTTPServer
                   if(memcmp(&receiveArray[dataCount],"tMax",sizeof("tMax")-1)==0)
                   {
                     dataCount+=(sizeof("tMin")-1+3);
-                    memoryManager->tMax=atof(&receiveArray[dataCount]);
+                    modbusData.tMax=atof(&receiveArray[dataCount]);
                     while(receiveArray[dataCount]!='\"' && receiveArray[dataCount]!=0 && receiveArray[dataCount]!=',' && receiveArray[dataCount]!='}' && dataCount<dataLen)
                     {
                       if(receiveArray[dataCount]==',')thresholds.print('.');
@@ -499,12 +499,12 @@ class HTTPServer
                 }
 
                 MemoryManager memoryManager;
-
-                int numberOfBytes = sprintf(receiveArray,"{\"tMin\":\"");
-                numberOfBytes+=memoryManager.readLineFromFile(&thresholds,&receiveArray[numberOfBytes]);
-                numberOfBytes+=sprintf(&receiveArray[numberOfBytes],"\",\"tMax\":\"");
-                numberOfBytes+=memoryManager.readLineFromFile(&thresholds,&receiveArray[numberOfBytes]);
-                numberOfBytes+=sprintf(&receiveArray[numberOfBytes],"\"}");
+                
+                int numberOfBytes = sprintf(receiveArray
+                                           ,"{\"tMin\":\"%.1f\",\"tMax\":\"%.1f\",\"isAlgoEn\":\"%u\"}"
+                                           ,modbusData.tMin
+                                           ,modbusData.tMax
+                                           ,modbusData.controlAllowed==0?0:1);
                 receiveArray[numberOfBytes]=0;
  
                 thresholds.close();                
@@ -517,7 +517,7 @@ class HTTPServer
               else if(memcmp(&receiveArray[0],"GET /Parameters",sizeof("GET /Parameters")-1)==0)
               {
                 int numberOfBytes = sprintf(receiveArray
-                                           ,"{\"Temperature\":\"%f\",\"Humidity\":\"%f\",\"ControlState\":\"%s\"}"
+                                           ,"{\"Temperature\":\"%.1f\",\"Humidity\":\"%.1f\",\"ControlState\":\"%s\"}"
                                            ,modbusData.Temperature
                                            ,modbusData.Humidity
                                            ,modbusData.doutState==0?"Heating":modbusData.doutState==1?"Stopped":"Coolling");

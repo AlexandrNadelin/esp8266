@@ -32,6 +32,7 @@ class WIFIManager
 
         modbusTCPServer.infoRegisters=&infoRegisters;
         modbusTCPServer.inputRegisters=&inputRegisters;
+        modbusTCPServer.holdingRegisters=&holdingRegisters;
         modbusTCPServer.contactRegisters=NULL;//&contactRegisters;
         modbusTCPServer.coilRegisters=&coilRegisters;
         modbusTCPServer.begin(memoryManager,pinsStateManager);

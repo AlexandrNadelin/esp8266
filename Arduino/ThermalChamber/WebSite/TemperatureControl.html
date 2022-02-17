@@ -63,6 +63,8 @@ function getTMinTMax(){
 	  let parameters = JSON.parse (reqGetParameters.response);
       d.getElementById('tMin').value = parameters.tMin;
       d.getElementById('tMax').value = parameters.tMax;
+      if(Number(parameters.isAlgoEn)>0)d.getElementById('EnAlgo').checked = true;
+      else d.getElementById('EnAlgo').checked = false;
 	}
   }
   

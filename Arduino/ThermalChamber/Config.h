@@ -19,6 +19,8 @@ float Temperature;
 float Humidity;
 uint16_t doutState;
 uint16_t controlAllowed;
+float tMin;
+float tMax;
 };
 
 ModbusData modbusData ={
@@ -26,9 +28,12 @@ ModbusData modbusData ={
   .Humidity=0,
   .doutState=1,/*0 - heating, 1 - disabled, 2 - coolling*/
   .controlAllowed=1,/*0- denied, 1 -allowed*/
+  .tMin=-128,
+  .tMax=127,
 };
 
 InputRegisters inputRegisters = {5,(uint16_t*)&modbusData.Temperature};
+HoldingRegisters holdingRegisters = {4,(uint16_t*)&modbusData.tMin};
 CoilRegisters coilRegisters = {1,(uint8_t*)&modbusData.controlAllowed};
 
 const uint8_t infoString[]="R_04_LOW_COST";
